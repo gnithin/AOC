@@ -1,5 +1,8 @@
 import sys
 
+DEFAULT_NUM_PAD = ['123', '456', '789']
+INVALID_CHAR = '*'
+
 
 def get_final_code(ip_str):
     curr_pos = (1, 1)
@@ -10,7 +13,7 @@ def get_final_code(ip_str):
     return final_code
 
 
-def get_numpad_code(ip, initial_pos=(1, 1)):
+def get_numpad_code(ip, initial_pos=(1, 1), custom_num_pad=None):
     print(ip)
     move_map = {
         'U': (0, -1),
@@ -19,7 +22,10 @@ def get_numpad_code(ip, initial_pos=(1, 1)):
         'R': (1, 0),
     }
 
-    num_pad = ['123', '456', '789']
+    if custom_num_pad is None:
+        num_pad = DEFAULT_NUM_PAD
+
+    max_num_pad_len = len(num_pad[0])
     curr_pos = initial_pos
     for dirn in ip:
         delta = move_map[dirn]
@@ -27,13 +33,16 @@ def get_numpad_code(ip, initial_pos=(1, 1)):
 
         invalid = False
         for pos in new_pos:
-            if pos < 0 or pos > 2:
+            if pos < 0 or pos > max_num_pad_len - 1:
                 invalid = True
                 break
 
-        if not invalid:
-            curr_pos = new_pos
-            print(curr_pos)
+        if (
+            not invalid and
+            num_pad[curr_pos[1]][curr_pos[0]] != INVALID_CHAR
+        ):
+                curr_pos = new_pos
+                print(curr_pos)
         else:
             print("Invalid")
 
