@@ -36,10 +36,32 @@
         return checksum;
     }
     
+    // Part 1
+    // checksum = [self getMaxMinDiffForRow:rowEntriesList];
+    // Part 2
+    checksum = [self getDivisibleQuotientForRow:rowEntriesList];
+    return checksum;
+}
+
+- (NSUInteger)getMaxMinDiffForRow:(NSArray<NSNumber *> *)rowEntriesList{
     NSNumber *maxVal = [rowEntriesList valueForKeyPath:@"@max.intValue"];
     NSNumber *minVal = [rowEntriesList valueForKeyPath:@"@min.intValue"];
-    checksum = [maxVal unsignedIntegerValue] - [minVal unsignedIntegerValue];
-    return checksum;
+    return [maxVal unsignedIntegerValue] - [minVal unsignedIntegerValue];
+}
+
+- (NSUInteger)getDivisibleQuotientForRow:(NSArray<NSNumber *> *)rowEntriesList{
+    NSArray<NSNumber *> *sortedList = [rowEntriesList sortedArrayUsingSelector:@selector(compare:)];
+    for(int i=0; i<([sortedList count]-1);i++){
+        NSUInteger smallNum = [sortedList[i] unsignedIntegerValue];
+        for(int j=i+1; j<[sortedList count];j++){
+            NSUInteger bigNum = [sortedList[j] unsignedIntegerValue];
+            if((bigNum % smallNum) == 0){
+                return bigNum/smallNum;
+            }
+        }
+    }
+    
+    return 0;
 }
 
 @end
