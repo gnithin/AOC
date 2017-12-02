@@ -11,7 +11,35 @@
 @implementation AOCQ2Main
 
 - (NSUInteger)calcChecksumFromString:(NSString *)spreadSheetContents{
-    return 0;
+    NSUInteger computedChecksum = 0;
+    NSArray<NSString *> *rowEntriesList = [spreadSheetContents componentsSeparatedByString:@"\n"];
+    for(NSString *rowEntry in rowEntriesList){
+        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"[^\\s]+" options:0 error:nil];
+        
+        __block NSMutableArray<NSNumber *> *rowEntriesList = [NSMutableArray new];
+        [regex enumerateMatchesInString:rowEntry options:0 range:NSMakeRange(0, [rowEntry length]) usingBlock:^(NSTextCheckingResult * _Nullable result, NSMatchingFlags flags, BOOL * _Nonnull stop) {
+            NSString *match = [rowEntry substringWithRange:[result range]];
+            NSNumber *matchNum = [NSNumber numberWithInteger:[match integerValue]];
+            [rowEntriesList addObject:matchNum];
+        }];
+        
+        NSUInteger checksum = [self getChecksumForRow:[NSArray arrayWithArray:rowEntriesList]];
+        computedChecksum += checksum;
+        
+    }
+    return computedChecksum;
+}
+
+- (NSUInteger)getChecksumForRow:(NSArray<NSNumber *> *)rowEntriesList{
+    NSUInteger checksum = 0;
+    if([rowEntriesList count] == 0){
+        return checksum;
+    }
+    
+    NSNumber *maxVal = [rowEntriesList valueForKeyPath:@"@max.intValue"];
+    NSNumber *minVal = [rowEntriesList valueForKeyPath:@"@min.intValue"];
+    checksum = [maxVal unsignedIntegerValue] - [minVal unsignedIntegerValue];
+    return checksum;
 }
 
 @end
