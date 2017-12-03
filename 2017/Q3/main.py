@@ -1,7 +1,7 @@
 from __future__ import print_function
 
 
-def build_matrix_of_size(side):
+def build_matrix_of_size(side, sum_val=None):
     if side % 2 == 0:
         return None
 
@@ -64,10 +64,36 @@ def build_matrix_of_size(side):
     val_counter = 1
     pos_list = pos_list[-1::-1]
 
-    for x, y in pos_list:
-        matrix[x][y] = val_counter
-        val_counter += 1
-    return matrix
+    if sum_val is None:
+        for x, y in pos_list:
+            matrix[x][y] = val_counter
+            val_counter += 1
+        return matrix
+    else:
+        value = None
+        for x, y in pos_list:
+            if val_counter == 1:
+                matrix[x][y] = val_counter
+                val_counter = 0
+                continue
+            # Find the adj_sum
+            adj_sum = 0
+            adj_inc = [(0, 1), (0, -1), (1, 0), (-1, 0),
+                       (1, 1), (-1, -1), (1, -1), (-1, 1)]
+            for adj_inc_x, adj_inc_y in adj_inc:
+                adj_x = x + adj_inc_x
+                if adj_x < 0 or adj_x >= side:
+                    continue
+                adj_y = y + adj_inc_y
+                if adj_y < 0 or adj_y >= side:
+                    continue
+                adj_sum += matrix[adj_x][adj_y]
+            matrix[x][y] = adj_sum
+
+            if value is None and adj_sum > sum_val:
+                value = adj_sum
+
+        return matrix, value
 
 
 def print_matrix(matrix):
@@ -99,6 +125,19 @@ def get_nearest_distance_to_element(element):
     return num_steps
 
 
+def get_sum_val_less_than(element):
+    matrix_size = int((element ** 0.5) + 1)
+    if matrix_size % 2 == 0:
+        matrix_size += 1
+
+    matrix, value = build_matrix_of_size(matrix_size, sum_val=element)
+    # print_matrix(matrix)
+    return value
+
+
 if __name__ == "__main__":
-    steps = get_nearest_distance_to_element(347991)
+    steps = get_nearest_distance_to_element(23)
     print("steps - " + str(steps))
+
+    value = get_sum_val_less_than(347991)
+    print("Value - " + str(value))
