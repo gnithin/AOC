@@ -118,7 +118,7 @@ def get_nearest_distance_to_element(element):
                 pos_x = i
                 pos_y = j
 
-    print("x - " + str(pos_x) + " y - " + str(pos_y))
+    # print("x - " + str(pos_x) + " y - " + str(pos_y))
     centre_pos_x = centre_pos_y = (matrix_size - 1)/2
     num_steps = abs(pos_x - centre_pos_x) + abs(pos_y - centre_pos_y)
 
@@ -136,7 +136,7 @@ def get_sum_val_less_than(element):
 
 
 if __name__ == "__main__":
-    steps = get_nearest_distance_to_element(23)
+    steps = get_nearest_distance_to_element(347991)
     print("steps - " + str(steps))
 
     value = get_sum_val_less_than(347991)
