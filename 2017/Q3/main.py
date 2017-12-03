@@ -20,10 +20,11 @@ def build_matrix_of_size(side):
     right_guard = side
     top_guard = 0
     bottom_guard = side-1
+    pos_list = list()
 
-    for val in xrange(side**2, 0, -1):
+    for val in xrange(side**2):
         # print(str(x) + " - " + str(y))
-        matrix[y][x] = val
+        pos_list.append((y, x))
         new_x = x
         new_y = y
         if dirn == "l":
@@ -59,6 +60,13 @@ def build_matrix_of_size(side):
                 bottom_guard -= 1
         x = new_x
         y = new_y
+
+    val_counter = 1
+    pos_list = pos_list[-1::-1]
+
+    for x, y in pos_list:
+        matrix[x][y] = val_counter
+        val_counter += 1
     return matrix
 
 
