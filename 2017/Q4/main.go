@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"sort"
 	"strings"
 )
 
@@ -37,15 +38,22 @@ func main() {
 func isPassphraseValid(passphrase string) bool {
 	phraseComponents := strings.Fields(passphrase)
 	phraseMap := make(map[string]bool)
+	sortedPhrasesList := []string{}
 
-	isValid := true
+	// This for part-2
 	for _, pc := range phraseComponents {
+		s := strings.Split(pc, "")
+		sort.Strings(s)
+		sortedStr := strings.Join(s, "")
+		sortedPhrasesList = append(sortedPhrasesList, sortedStr)
+	}
+
+	for _, pc := range sortedPhrasesList {
 		isFound, _ := phraseMap[pc]
 		if isFound {
-			isValid = false
-			break
+			return false
 		}
 		phraseMap[pc] = true
 	}
-	return isValid
+	return true
 }
