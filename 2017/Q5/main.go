@@ -9,8 +9,14 @@ import (
 
 func main() {
 	ipList := getIpListFromFilename("ip.txt")
-	numSteps := getNumJumpsForList(ipList)
-	fmt.Println("Number of steps - ", numSteps)
+	ipListCopy := make([]int, len(ipList))
+	copy(ipListCopy, ipList)
+
+	numSteps := getNumJumpsForList(ipList, false)
+	fmt.Println("p1 Number of steps - ", numSteps)
+
+	numSteps = getNumJumpsForList(ipListCopy, true)
+	fmt.Println("p2 Number of steps - ", numSteps)
 }
 
 func getIpListFromFilename(filename string) []int {
@@ -36,14 +42,23 @@ func getIpListFromFilename(filename string) []int {
 	return ipList
 }
 
-func getNumJumpsForList(ipList []int) int {
+func getNumJumpsForList(ipList []int, isP2 bool) int {
 	numSteps := 0
 	currLoc := 0
 
 	for currLoc < len(ipList) && currLoc >= 0 {
 		numSteps += 1
 		currVal := ipList[currLoc]
-		ipList[currLoc] = currVal + 1
+
+		// Solution to p2
+		inc := 1
+		if isP2 {
+			if currVal >= 3 {
+				inc = -1
+			}
+		}
+
+		ipList[currLoc] = currVal + inc
 		currLoc = currLoc + currVal
 	}
 	return numSteps
