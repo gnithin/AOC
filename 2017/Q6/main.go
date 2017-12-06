@@ -7,17 +7,23 @@ import (
 	"strings"
 )
 
-func findNumStepsForBlocksBeforeRepeat(originalBlocks []int) int {
+func findNumStepsForBlocksBeforeRepeat(originalBlocks []int) (int, int) {
 	blocksLen := len(originalBlocks)
 	blocks := make([]int, blocksLen)
 	copy(blocks, originalBlocks)
 	history := [][]int{}
 	runCount := 0
+	firstRepeat := 0
+	repeatCycle := -1
+	isRepeatMode := false
+	repeatedBlock := make([]int, blocksLen)
 
 	for {
-		blocksCopy := make([]int, blocksLen)
-		copy(blocksCopy, blocks)
-		history = append(history, blocksCopy)
+		if !isRepeatMode {
+			blocksCopy := make([]int, blocksLen)
+			copy(blocksCopy, blocks)
+			history = append(history, blocksCopy)
+		}
 
 		maxIndex := getIndexOfMaxInList(blocks)
 		maxVal := blocks[maxIndex]
@@ -31,11 +37,20 @@ func findNumStepsForBlocksBeforeRepeat(originalBlocks []int) int {
 
 		runCount += 1
 
-		if listContainsBlock(history, blocks) {
-			break
+		if !isRepeatMode {
+			if listContainsBlock(history, blocks) {
+				isRepeatMode = true
+				firstRepeat = runCount
+				copy(repeatedBlock, blocks)
+			}
+		} else {
+			if areBlocksEqual(repeatedBlock, blocks) {
+				repeatCycle = runCount - firstRepeat
+				break
+			}
 		}
 	}
-	return runCount
+	return firstRepeat, repeatCycle
 }
 
 func listContainsBlock(list [][]int, block []int) bool {
@@ -44,24 +59,24 @@ func listContainsBlock(list [][]int, block []int) bool {
 	//fmt.Println(list)
 
 	for _, currBlock := range list {
-		if len(currBlock) != len(block) {
-			continue
-		}
-
-		isEqual := true
-		for i := 0; i < len(currBlock); i++ {
-			if currBlock[i] != block[i] {
-				isEqual = false
-				break
-			}
-		}
-
-		if isEqual {
+		if areBlocksEqual(currBlock, block) {
 			return true
 		}
 	}
 	return false
+}
 
+func areBlocksEqual(block1 []int, block2 []int) bool {
+	if len(block1) != len(block2) {
+		return false
+	}
+
+	for i := 0; i < len(block1); i++ {
+		if block1[i] != block2[i] {
+			return false
+		}
+	}
+	return true
 }
 
 func getIndexOfMaxInList(list []int) int {
@@ -86,7 +101,9 @@ func main() {
 	filename := "ip.txt"
 	blocks := getIpListFromFilename(filename)
 	fmt.Println("Input blocks - ", blocks)
-	fmt.Println("Number of steps before recursion - ", findNumStepsForBlocksBeforeRepeat(blocks))
+	firstRepeat, repeatCycle := findNumStepsForBlocksBeforeRepeat(blocks)
+	fmt.Println("Number of steps before recursion - ", firstRepeat)
+	fmt.Println("Number of steps for repeat cycle - ", repeatCycle)
 }
 
 func getIpListFromFilename(filename string) []int {
