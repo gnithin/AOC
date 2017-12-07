@@ -29,6 +29,80 @@ func (p *ProgramData) populateFromString(ipStr string) {
 	p.weight = weight
 }
 
+func (p *ProgramData) getCorrectedWeight() int {
+	var weightDistribution map[int][]int = make(map[int][]int)
+
+	for topIndex, childProgram := range p.onTop {
+		weight := childProgram.getWeight()
+		_, isFound := weightDistribution[weight]
+		if !isFound {
+			weightDistribution[weight] = []int{topIndex}
+		} else {
+			weightDistribution[weight] = append(weightDistribution[weight], topIndex)
+		}
+	}
+
+	commonWeight := -1
+	outlierWeight := -1
+	for weight, indices := range weightDistribution {
+		if len(indices) == 1 {
+			outlierWeight = weight
+		} else {
+			commonWeight = weight
+		}
+	}
+
+	weightDiff := outlierWeight - commonWeight
+
+	unequalProgram := p.getUnEqualProgram()
+	return unequalProgram.weight - weightDiff
+}
+
+func (p *ProgramData) getUnEqualProgram() *ProgramData {
+	if len(p.onTop) == 0 {
+		return p
+	}
+
+	var weightDistribution map[int][]int = make(map[int][]int)
+
+	for topIndex, childProgram := range p.onTop {
+		weight := childProgram.getWeight()
+		_, isFound := weightDistribution[weight]
+		if !isFound {
+			weightDistribution[weight] = []int{topIndex}
+		} else {
+			weightDistribution[weight] = append(weightDistribution[weight], topIndex)
+		}
+	}
+
+	outlierIndex := -1
+	for _, indices := range weightDistribution {
+		if len(indices) == 1 {
+			outlierIndex = indices[0]
+		}
+	}
+
+	if outlierIndex == -1 {
+		return p
+	}
+
+	unEqualProgram := p.onTop[outlierIndex]
+
+	return unEqualProgram.getUnEqualProgram()
+
+}
+
+func (p *ProgramData) getWeight() int {
+	weight := p.weight
+	for _, childProgram := range p.onTop {
+		weight += childProgram.getWeight()
+	}
+
+	return weight
+}
+
+// Part 1
+
 func getBaseFromIpList(ipList []string) *ProgramData {
 	sep := "->"
 
@@ -92,11 +166,21 @@ func removeProgramFromBaseList(parentNameStr string) {
 	baseProgramFilterList = append(baseProgramFilterList[:parentIndex], baseProgramFilterList[parentIndex+1:]...)
 }
 
+// Part 2
+func findUnequalWeighForBaseProgram(baseProgram *ProgramData) int {
+	return baseProgram.getCorrectedWeight()
+}
+
+// Main
 func main() {
 	filename := "ip.txt"
 	ipList := getIpListFromFilename(filename)
 	baseProgram := getBaseFromIpList(ipList)
 	fmt.Println("Base name - ", baseProgram.name)
+
+	unequalWeight := findUnequalWeighForBaseProgram(baseProgram)
+	fmt.Println("Unequal weight - ", unequalWeight)
+
 }
 
 func getIpListFromFilename(filename string) []string {
