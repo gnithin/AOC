@@ -7,17 +7,23 @@ import (
 	"strings"
 )
 
-func findNumSteps(positions []string) int {
+func findNumSteps(positions []string) (int, int) {
+	maxDistance := -1
 	finalPos := []int{0, 0, 0}
 	for _, pos := range positions {
 		x, y, z := posToCoordMap(pos)
 		finalPos[0] += x
 		finalPos[1] += y
 		finalPos[2] += z
+
+		currDistance := calcDistanceFromOrigin(finalPos)
+		if currDistance > maxDistance {
+			maxDistance = currDistance
+		}
 	}
 
 	// Find the max
-	return calcDistanceFromOrigin(finalPos)
+	return calcDistanceFromOrigin(finalPos), maxDistance
 }
 
 // This calculation is from this awesome page -
@@ -55,8 +61,9 @@ func main() {
 	filename := "ip.txt"
 	ipList := getIpListFromFilename(filename)
 	for _, ip := range ipList {
-		shortestNumSteps := findNumSteps(ip)
+		shortestNumSteps, maxDistance := findNumSteps(ip)
 		fmt.Println("Shortest number of steps - ", shortestNumSteps)
+		fmt.Println("Max distance - ", maxDistance)
 	}
 }
 
