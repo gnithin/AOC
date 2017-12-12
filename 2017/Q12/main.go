@@ -38,12 +38,44 @@ func findNumProgramsConnectedTo(idStr string, ipMap map[string][]string) (int, [
 }
 
 func isItemInArray(needle string, haystack []string) bool {
-	for _, item := range haystack {
+	return indexOfItemInArray(needle, haystack) != -1
+}
+
+func indexOfItemInArray(needle string, haystack []string) int {
+	for pos, item := range haystack {
 		if item == needle {
-			return true
+			return pos
 		}
 	}
-	return false
+	return -1
+}
+
+// Part 2
+func findNumGroups(ipMap map[string][]string) int {
+	numGroups := 0
+	var keysList []string
+	for key, _ := range ipMap {
+		keysList = append(keysList, key)
+	}
+
+	for len(keysList) > 0 {
+		item := keysList[0]
+		_, groupMembers := findNumProgramsConnectedTo(item, ipMap)
+		keysList = updateSliceByRemovingItems(keysList, groupMembers)
+		numGroups += 1
+	}
+	return numGroups
+}
+
+func updateSliceByRemovingItems(slice, removalItems []string) []string {
+	for _, item := range removalItems {
+		pos := indexOfItemInArray(item, slice)
+		if pos == -1 {
+			continue
+		}
+		slice = append(slice[:pos], slice[pos+1:]...)
+	}
+	return slice
 }
 
 // Main
@@ -55,6 +87,9 @@ func main() {
 	idStr := "0"
 	numProgs, _ := findNumProgramsConnectedTo(idStr, ipMap)
 	fmt.Println("Number of programs connected to", idStr, "-", numProgs)
+
+	numGroups := findNumGroups(ipMap)
+	fmt.Println("Number of groups - ", numGroups)
 }
 
 func getIpListFromFilename(filename string) map[string][]string {
