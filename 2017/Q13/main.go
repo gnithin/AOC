@@ -172,19 +172,40 @@ func findSeverity(depthRangeMap map[int]int, delay int) (bool, int) {
 }
 
 // Part - 2
+// Had a brute force solution that took a loong time, and could never complete
+// This is a more elegant solution, intellectually awesome,
+// that presented itself after a really good dinner :)
 func findMinDelay(depthRangeMap map[int]int) int {
-	delay := 3870382
-	for {
-		if delay%1000 == 0 {
-			fmt.Println("Delay - ", delay)
+	maxDepth := findMaxDepth(depthRangeMap)
+	for delay := 0; ; delay += 1 {
+		pathFound := true
+		for layer := 0; layer <= maxDepth; layer++ {
+			currDepth, _ := depthRangeMap[layer]
+			if currDepth == 0 {
+				continue
+			}
+
+			currPos := (delay + layer) % (2 * (currDepth - 1))
+			if currPos == 0 {
+				pathFound = false
+				break
+			}
 		}
-		isCaught, _ := findSeverity(depthRangeMap, delay)
-		if !isCaught {
+		if pathFound {
 			return delay
 		}
-		delay += 1
 	}
 	return -1
+}
+
+func findMaxDepth(depthRangeMap map[int]int) int {
+	maxDepth := -1
+	for depth, _ := range depthRangeMap {
+		if maxDepth < depth {
+			maxDepth = depth
+		}
+	}
+	return maxDepth
 }
 
 // Main
@@ -192,7 +213,6 @@ func main() {
 	//filename := "trial.txt"
 	filename := "ip.txt"
 	depthRangeMap := getIpListFromFilename(filename)
-	fmt.Println(depthRangeMap)
 	_, severity := findSeverity(depthRangeMap, 0)
 	fmt.Println("Severity -", severity)
 
