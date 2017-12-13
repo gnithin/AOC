@@ -71,9 +71,8 @@ func (l *Layer) incrementScanner() {
 	}
 }
 
-var firewall []*Layer
-
-func findSeverity(depthRangeMap map[int]int) int {
+func findSeverity(depthRangeMap map[int]int, delay int) (bool, int) {
+	var firewall []*Layer
 	var severeDepths []int
 
 	// Create a packet with initial position as -1
@@ -104,7 +103,7 @@ func findSeverity(depthRangeMap map[int]int) int {
 	}
 
 	// Go psec by psec with both modes
-	numPicoSecs := maxDepth + 1
+	numPicoSecs := maxDepth + 1 + delay
 	for i := 0; i < numPicoSecs; i++ {
 		/*
 			banner := "*******"
@@ -112,7 +111,9 @@ func findSeverity(depthRangeMap map[int]int) int {
 		*/
 
 		// Update the packet before doing anything else
-		packet.currLayer += 1
+		if i >= delay {
+			packet.currLayer += 1
+		}
 		for j := 0; j < len(firewall); j++ {
 			layer := firewall[j]
 			if packet.currLayer == j {
@@ -133,9 +134,11 @@ func findSeverity(depthRangeMap map[int]int) int {
 
 		// Checking severity
 		currPacketLayerNum := packet.currLayer
-		currPacketLayer := firewall[currPacketLayerNum]
-		if currPacketLayer.scannerRange > 0 && currPacketLayer.scannerPos == 0 {
-			severeDepths = append(severeDepths, packet.currLayer)
+		if currPacketLayerNum != -1 {
+			currPacketLayer := firewall[currPacketLayerNum]
+			if currPacketLayer.scannerRange > 0 && currPacketLayer.scannerPos == 0 {
+				severeDepths = append(severeDepths, packet.currLayer)
+			}
 		}
 
 		// Update the firewall
@@ -160,7 +163,28 @@ func findSeverity(depthRangeMap map[int]int) int {
 		r, _ := depthRangeMap[s]
 		severity += s * r
 	}
-	return severity
+
+	isCaught := false
+	if len(severeDepths) != 0 {
+		isCaught = true
+	}
+	return isCaught, severity
+}
+
+// Part - 2
+func findMinDelay(depthRangeMap map[int]int) int {
+	delay := 3870382
+	for {
+		if delay%1000 == 0 {
+			fmt.Println("Delay - ", delay)
+		}
+		isCaught, _ := findSeverity(depthRangeMap, delay)
+		if !isCaught {
+			return delay
+		}
+		delay += 1
+	}
+	return -1
 }
 
 // Main
@@ -169,8 +193,11 @@ func main() {
 	filename := "ip.txt"
 	depthRangeMap := getIpListFromFilename(filename)
 	fmt.Println(depthRangeMap)
-	severity := findSeverity(depthRangeMap)
+	_, severity := findSeverity(depthRangeMap, 0)
 	fmt.Println("Severity -", severity)
+
+	minDelay := findMinDelay(depthRangeMap)
+	fmt.Println("Min delay - ", minDelay)
 }
 
 func getIpListFromFilename(filename string) map[int]int {
