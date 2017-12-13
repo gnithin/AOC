@@ -7,7 +7,8 @@ import (
 )
 
 func main() {
-	filename := "ip.txt"
+	//filename := "ip.txt"
+	filename := "trial.txt"
 	ipList := getIpListFromFilename(filename)
 	fmt.Printf("Input - [%s]\n", strings.Join(ipList, ", "))
 }
