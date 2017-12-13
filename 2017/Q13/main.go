@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // Part 1
@@ -173,18 +174,14 @@ func findSeverity(depthRangeMap map[int]int, delay int) (bool, int) {
 
 // Part - 2
 // Had a brute force solution that took a loong time, and could never complete
-// This is a more elegant solution, intellectually awesome,
+// This is an elegant solution, intellectually awesome (my opinion ofcourse)
 // that presented itself after a really good dinner :)
 func findMinDelay(depthRangeMap map[int]int) int {
-	maxDepth := findMaxDepth(depthRangeMap)
+	layerOrder := (*findLayerOrder(depthRangeMap))
 	for delay := 0; ; delay += 1 {
 		pathFound := true
-		for layer := 0; layer <= maxDepth; layer++ {
+		for _, layer := range layerOrder {
 			currDepth, _ := depthRangeMap[layer]
-			if currDepth == 0 {
-				continue
-			}
-
 			currPos := (delay + layer) % (2 * (currDepth - 1))
 			if currPos == 0 {
 				pathFound = false
@@ -198,14 +195,34 @@ func findMinDelay(depthRangeMap map[int]int) int {
 	return -1
 }
 
-func findMaxDepth(depthRangeMap map[int]int) int {
-	maxDepth := -1
-	for depth, _ := range depthRangeMap {
-		if maxDepth < depth {
-			maxDepth = depth
+func findLayerOrder(depthRangeMap map[int]int) *[]int {
+	maxRange := -1
+
+	rangeDepthMap := make(map[int]*[]int)
+	for d, r := range depthRangeMap {
+		if r > maxRange {
+			maxRange = r
+		}
+
+		dMap, ok := rangeDepthMap[r]
+		if !ok {
+			dMap := []int{d}
+			rangeDepthMap[r] = &dMap
+		} else {
+			*dMap = append(*dMap, d)
 		}
 	}
-	return maxDepth
+
+	var layerOrder []int
+	for i := 0; i <= maxRange; i++ {
+		dList, ok := rangeDepthMap[i]
+		if !ok {
+			continue
+		}
+		layerOrder = append(layerOrder, (*dList)...)
+	}
+
+	return &layerOrder
 }
 
 // Main
@@ -213,11 +230,41 @@ func main() {
 	//filename := "trial.txt"
 	filename := "ip.txt"
 	depthRangeMap := getIpListFromFilename(filename)
+
 	_, severity := findSeverity(depthRangeMap, 0)
 	fmt.Println("Severity -", severity)
 
 	minDelay := findMinDelay(depthRangeMap)
 	fmt.Println("Min delay - ", minDelay)
+
+	//testMinDelay(depthRangeMap)
+}
+
+func testMinDelay(depthRangeMap map[int]int) {
+	var timeDiffList []int64
+	counter := 10
+
+	for i := 0; i < counter; i++ {
+		startTime := getCurrentTimeMillis()
+		findMinDelay(depthRangeMap)
+		endTime := getCurrentTimeMillis()
+		timeDiff := endTime - startTime
+		timeDiffList = append(timeDiffList, timeDiff)
+	}
+	fmt.Println("time - ", timeDiffList)
+	sum := int64(0)
+	for _, timeDiff := range timeDiffList {
+		sum += timeDiff
+	}
+	fmt.Println("Avg time - ", sum/int64(len(timeDiffList)))
+
+}
+
+func getCurrentTimeMillis() int64 {
+	now := time.Now()
+	nanos := now.UnixNano()
+	millis := nanos / 1000000
+	return millis
 }
 
 func getIpListFromFilename(filename string) map[int]int {
