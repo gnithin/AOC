@@ -178,17 +178,22 @@ func findSeverity(depthRangeMap map[int]int, delay int) (bool, int) {
 // that presented itself after a really good dinner :)
 func findMinDelay(depthRangeMap map[int]int) int {
 	layerOrder := (*findLayerOrder(depthRangeMap))
+	var layerDepthList [][]int
+	for _, layer := range layerOrder {
+		r := depthRangeMap[layer]
+		layerDepthList = append(layerDepthList, []int{layer, (r - 1) << 1})
+	}
+	lenLayerDepthList := len(layerDepthList)
+
 	for delay := 0; ; delay += 1 {
-		pathFound := true
-		for _, layer := range layerOrder {
-			currDepth, _ := depthRangeMap[layer]
-			currPos := (delay + layer) % (2 * (currDepth - 1))
-			if currPos == 0 {
-				pathFound = false
+		flagInt := 0
+		for _, item := range layerDepthList {
+			if (delay+item[0])%(item[1]) == 0 {
 				break
 			}
+			flagInt += 1
 		}
-		if pathFound {
+		if lenLayerDepthList == flagInt {
 			return delay
 		}
 	}
