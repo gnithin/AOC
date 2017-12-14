@@ -109,6 +109,9 @@ func part2(filename string, ipArrLen int) {
 		ipArr = append(ipArr, i)
 	}
 
+	fmt.Println("LenList - ", lenList, len(lenList))
+	fmt.Println("ipArr - ", ipArr, len(ipArr))
+
 	hashStr := performKnotHash(ipArr, lenList)
 	fmt.Println("Final knot hash -", hashStr)
 }
