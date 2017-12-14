@@ -64,7 +64,14 @@ type Coords struct {
 }
 
 func getNumRegions(ipKey string) int {
-	_, rowwiseUsedIndicies := getNumUsedSquares(ipKey)
+	//_, rowwiseUsedIndicies := getNumUsedSquares(ipKey)
+	rowwiseUsedIndicies := [][]int{
+		{0, 1, 3, 4},
+		{0, 3},
+		{},
+		{0, 4},
+	}
+
 	numRegions := 0
 	row := 0
 
