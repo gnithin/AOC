@@ -64,14 +64,28 @@ type Coords struct {
 }
 
 func getNumRegions(ipKey string) int {
-	//_, rowwiseUsedIndicies := getNumUsedSquares(ipKey)
-	rowwiseUsedIndicies := [][]int{
-		{0, 1, 3, 4},
-		{0, 3},
-		{},
-		{0, 4},
-	}
+	_, rowwiseUsedIndicies := getNumUsedSquares(ipKey)
+	/*
+		rowwiseUsedIndicies := [][]int{
+			{0, 1, 3, 4},
+			{0, 3},
+			{1, 2, 3},
+			{},
+			{0, 4},
+		}
 
+		rowwiseUsedIndicies := [][]int{
+			{0, 1, 3, 5},
+			{1, 3, 5, 7},
+			{4, 6},
+			{0, 2, 4, 5, 7},
+			{1, 2, 4},
+			{0, 1, 4, 7},
+			{1, 5},
+			{0, 1, 3, 5, 6},
+		}
+
+	*/
 	numRegions := 0
 	row := 0
 
@@ -86,7 +100,7 @@ func getNumRegions(ipKey string) int {
 		regionCoords := mapARegionForCoords(currCoords, &rowwiseUsedIndicies)
 
 		if len(regionCoords) == 0 {
-			panic("This shouldn't happen 1")
+			panic("This shouldn't happen - RegionCoords cannot be empty!")
 		}
 
 		// Remove all the region coords from the rowwiseUsedIndices
@@ -94,25 +108,22 @@ func getNumRegions(ipKey string) int {
 			colsList := rowwiseUsedIndicies[regionCoord.row]
 			colPos := find(regionCoord.col, colsList)
 			if colPos == -1 {
-				panic("This shouldn't happen 2")
+				panic("This shouldn't happen - Column position cannot unmatch a region-coord")
 			}
 			colsList = append(colsList[:colPos], colsList[colPos+1:]...)
 			rowwiseUsedIndicies[regionCoord.row] = colsList
 		}
-
 		numRegions += 1
 	}
-
 	return numRegions
 }
 
-func mapARegionForCoords(currCoords Coords, rowwiseUsedIndicies *[][]int) []*Coords {
-	var regionQueue []*Coords
-	regionQueue = append(regionQueue, &currCoords)
-	var regionCoords []*Coords
+func mapARegionForCoords(currCoords Coords, rowwiseUsedIndicies *[][]int) []Coords {
+	var regionQueue []Coords
+	regionQueue = append(regionQueue, currCoords)
+	var regionCoords = []Coords{currCoords}
 
 	for len(regionQueue) != 0 {
-		// Pop from region queue
 		poppedCoordsPtr := regionQueue[0]
 		regionQueue = regionQueue[1:]
 
@@ -134,12 +145,24 @@ func mapARegionForCoords(currCoords Coords, rowwiseUsedIndicies *[][]int) []*Coo
 			col: poppedCoordsPtr.col,
 		}
 		for _, c := range []Coords{leftCoord, rightCoord, topCoord, bottomCoord} {
+			// Check if c is already present in regionCoords
+			isAlreadyPresent := false
+			for _, regionC := range regionCoords {
+				if regionC.col == c.col && regionC.row == c.row {
+					isAlreadyPresent = true
+					break
+				}
+			}
+			if isAlreadyPresent {
+				continue
+			}
+
 			if findCoord(c, rowwiseUsedIndicies) {
-				regionCoords = append(regionCoords, &c)
+				regionCoords = append(regionCoords, c)
+				regionQueue = append(regionQueue, c)
 			}
 		}
 	}
-
 	return regionCoords
 }
 
@@ -172,12 +195,13 @@ func find(needle int, haystack []int) int {
 
 // Main
 func main() {
-	ipKey := "flqrgnkx"
-	//ipKey := "jxqlasbh"
+	//ipKey := "flqrgnkx"
+	ipKey := "jxqlasbh"
+
 	fmt.Println("Ip key - ", ipKey)
 	used, _ := getNumUsedSquares(ipKey)
-	fmt.Println("P1 : Used squares - ", used)
+	fmt.Println("P1 : Used squares -", used)
 
 	numRegions := getNumRegions(ipKey)
-	fmt.Println("P2 : Number of regions - ", numRegions)
+	fmt.Println("P2 : Number of regions -", numRegions)
 }
