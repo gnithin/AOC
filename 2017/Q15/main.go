@@ -6,13 +6,24 @@ import (
 )
 
 type Generator struct {
-	currVal int64
-	factor  int64
-	maxVal  int64
+	currVal     int64
+	factor      int64
+	maxVal      int64
+	pickyFactor int64
 }
 
 func (g *Generator) generateNextVal() int64 {
 	g.currVal = (g.currVal * g.factor) % g.maxVal
+	return g.currVal
+}
+
+func (g *Generator) generateNextValPicky() int64 {
+	for {
+		g.currVal = (g.currVal * g.factor) % g.maxVal
+		if g.currVal%g.pickyFactor == 0 {
+			break
+		}
+	}
 	return g.currVal
 }
 
@@ -31,11 +42,16 @@ func (g *Generator) getBaseBinStrOfVal(numDigits int64) string {
 }
 
 // Part 1
-func getNumMatches(genA, genB Generator, limit int64) int64 {
+func getNumMatches(genA, genB Generator, genPicky bool, limit int64) int64 {
 	numMatches := int64(0)
 	for i := int64(0); i < limit; i++ {
-		genA.generateNextVal()
-		genB.generateNextVal()
+		if !genPicky {
+			genA.generateNextVal()
+			genB.generateNextVal()
+		} else {
+			genA.generateNextValPicky()
+			genB.generateNextValPicky()
+		}
 
 		aStr := genA.getBaseBinStrOfVal(16)
 		bStr := genB.getBaseBinStrOfVal(16)
@@ -68,7 +84,15 @@ func main() {
 		maxVal:  MAX_VAL,
 	}
 
-	limit := int64(40 * 1000000)
-	numMatches := getNumMatches(genA, genB, limit)
-	fmt.Println("Num matches - ", numMatches)
+	p1Limit := int64(40 * 1000000)
+	numMatches := getNumMatches(genA, genB, false, p1Limit)
+	fmt.Println("P1 Num matches - ", numMatches)
+
+	p2Limit := int64(5 * 1000000)
+	genA.currVal = genAInit
+	genA.pickyFactor = int64(4)
+	genB.currVal = genBInit
+	genB.pickyFactor = int64(8)
+	numP2Matches := getNumMatches(genA, genB, true, p2Limit)
+	fmt.Println("P2 Num matches - ", numP2Matches)
 }
