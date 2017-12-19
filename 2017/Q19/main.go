@@ -18,8 +18,9 @@ const (
 )
 
 // Part 1
-func getLetters(pathList []string) string {
+func getLetters(pathList []string) (string, int) {
 	lettersFound := ""
+	numSteps := 0
 
 	// Find the initial position
 	currRow := 0
@@ -34,7 +35,6 @@ func getLetters(pathList []string) string {
 
 	for {
 		currPath := string(pathList[currRow][currCol])
-		//fmt.Println("Curr path - ", currPath)
 
 		switch currPath {
 		case VER_PATH:
@@ -42,8 +42,6 @@ func getLetters(pathList []string) string {
 		case HOR_PATH:
 			// pass
 		case DIRN_ANCHOR:
-			//fmt.Println("Dirn change - ")
-			//fmt.Println("Old dirn - ", currDirn)
 			// Find out where to go based on the current direction
 			if currDirn == DIRN_UP || currDirn == DIRN_DOWN {
 				// Examine left and right
@@ -66,7 +64,6 @@ func getLetters(pathList []string) string {
 					currDirn = DIRN_DOWN
 				}
 			}
-			//fmt.Println("new dirn - ", currDirn)
 		default:
 			if unicode.IsLetter([]rune(currPath)[0]) {
 				lettersFound += currPath
@@ -78,6 +75,7 @@ func getLetters(pathList []string) string {
 		if endFound {
 			break
 		}
+		numSteps += 1
 
 		// Update the path count
 		switch currDirn {
@@ -91,8 +89,7 @@ func getLetters(pathList []string) string {
 			currCol += 1
 		}
 	}
-
-	return lettersFound
+	return lettersFound, numSteps
 }
 
 func findPos(needle string, haystack string) int {
@@ -109,13 +106,9 @@ func main() {
 	filename := "ip.txt"
 	//filename := "trial.txt"
 	ipList := getIpListFromFilename(filename)
-	/*
-		for _, ip := range ipList {
-			fmt.Println(ip)
-		}
-	*/
-	letters := getLetters(ipList)
+	letters, numSteps := getLetters(ipList)
 	fmt.Println("Letters from path - ", letters)
+	fmt.Println("Number of steps - ", numSteps)
 }
 
 func getIpListFromFilename(filename string) []string {
