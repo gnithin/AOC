@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
-	"strconv"
 	"strings"
 )
 
@@ -33,11 +32,7 @@ func main() {
 	size := 10000000
 	ch1 := make(chan int, size)
 	ch2 := make(chan int, size)
-	responseChan := make(chan int)
-	/*
-		flagValue1 := false
-		flagValue2 := false
-	*/
+	responseChan := make(chan int, 2)
 
 	interpreter0 := createInterpreter(
 		0,
@@ -46,6 +41,11 @@ func main() {
 		ch2,
 		responseChan,
 	)
+
+	/*
+		interpreter0.run()
+		fmt.Println("Send value of interpreter -", interpreter0.sendCount)
+	*/
 
 	interpreter1 := createInterpreter(
 		1,
@@ -85,25 +85,16 @@ func getIpListFromFilename(filename string) []Instruction {
 		ipStr = strings.TrimSpace(ipStr)
 		ipComponents := strings.Split(ipStr, " ")
 		cmdName := ipComponents[0]
-
-		register := ""
-		argIndex := 1
+		arg1 := ipComponents[1]
+		arg2 := ""
 		if len(ipComponents) > 2 {
-			register = ipComponents[1]
-			argIndex = 2
-		}
-		var argument interface{}
-		value, err := strconv.Atoi(ipComponents[argIndex])
-		if err != nil {
-			argument = ipComponents[argIndex]
-		} else {
-			argument = value
+			arg2 = ipComponents[2]
 		}
 
 		instn := Instruction{
 			cmdName,
-			register,
-			argument,
+			arg1,
+			arg2,
 		}
 		instnList = append(instnList, instn)
 	}

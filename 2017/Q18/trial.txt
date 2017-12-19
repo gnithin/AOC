@@ -2,9 +2,8 @@ set a 1
 add a 2
 mul a a
 mod a 5
-snd a
-set a 0
-rcv a
+add a -1
 jgz a -1
-set a 1
+set a 0
 jgz a -2
+set a 10
