@@ -79,6 +79,7 @@ func (self *Interpreter) run() {
 func (self *Interpreter) runInstn() bool {
 	currInstn := self.instnList[self.instnIndex]
 	register := currInstn.register
+	rcvRegister := ""
 
 	argVal := 0
 	switch tempArgVal := currInstn.argument.(type) {
@@ -86,6 +87,7 @@ func (self *Interpreter) runInstn() bool {
 		argVal = tempArgVal
 	case string:
 		argVal = self.getValOfRegister(tempArgVal)
+		rcvRegister = tempArgVal
 		//register = tempArgVal
 	case nil:
 		// Pass
@@ -132,8 +134,8 @@ func (self *Interpreter) runInstn() bool {
 			fmt.Println("Reg val - ", self.sendCount)
 		}
 		newVal := <-self.readingChan
-		//fmt.Println(self.progId, "Received - ", newVal)
-		self.setValToRegister(register, newVal)
+		fmt.Println(self.progId, "Received - ", newVal, "setting register - ", rcvRegister)
+		self.setValToRegister(rcvRegister, newVal)
 		self.instnIndex += 1
 
 	case INSTN_JGZ:
