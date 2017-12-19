@@ -34,16 +34,16 @@ func main() {
 	ch1 := make(chan int, size)
 	ch2 := make(chan int, size)
 	responseChan := make(chan int)
-	flagValue1 := false
-	flagValue2 := false
+	/*
+		flagValue1 := false
+		flagValue2 := false
+	*/
 
 	interpreter0 := createInterpreter(
 		0,
 		instnList,
 		ch1,
 		ch2,
-		&flagValue1,
-		&flagValue2,
 		responseChan,
 	)
 
@@ -52,8 +52,6 @@ func main() {
 		instnList,
 		ch2,
 		ch1,
-		&flagValue2,
-		&flagValue1,
 		responseChan,
 	)
 

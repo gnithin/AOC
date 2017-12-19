@@ -24,17 +24,15 @@ type Instruction struct {
 
 // Interprets the instruction set
 type Interpreter struct {
-	instnList                 []Instruction
-	varEnv                    map[string]int
-	instnIndex                int
-	readingChan               chan int
-	writingChan               chan int
-	isReadingStatusForReading *bool
-	isReadingStatusForWriting *bool
-	sendCount                 int
-	responseChan              chan int
-	stopInterrupt             bool
-	progId                    int
+	instnList     []Instruction
+	varEnv        map[string]int
+	instnIndex    int
+	readingChan   chan int
+	writingChan   chan int
+	sendCount     int
+	responseChan  chan int
+	stopInterrupt bool
+	progId        int
 }
 
 func createInterpreter(
@@ -42,24 +40,20 @@ func createInterpreter(
 	instnList []Instruction,
 	readingChan,
 	writingChan chan int,
-	isReadingStatusForReading,
-	isReadingStatusForWriting *bool,
 	responseChan chan int,
 ) Interpreter {
 	varEnv := make(map[string]int)
 	varEnv[REG_PROG_ID] = progId
 
 	return Interpreter{
-		progId:                    progId,
-		instnList:                 instnList,
-		varEnv:                    varEnv,
-		instnIndex:                0,
-		readingChan:               readingChan,
-		writingChan:               writingChan,
-		isReadingStatusForReading: isReadingStatusForReading,
-		isReadingStatusForWriting: isReadingStatusForWriting,
-		responseChan:              responseChan,
-		stopInterrupt:             false,
+		progId:        progId,
+		instnList:     instnList,
+		varEnv:        varEnv,
+		instnIndex:    0,
+		readingChan:   readingChan,
+		writingChan:   writingChan,
+		responseChan:  responseChan,
+		stopInterrupt: false,
 	}
 }
 
@@ -137,7 +131,6 @@ func (self *Interpreter) runInstn() bool {
 		if self.progId == 1 {
 			fmt.Println("Reg val - ", self.sendCount)
 		}
-		(*self.isReadingStatusForWriting) = true
 		newVal := <-self.readingChan
 		//fmt.Println(self.progId, "Received - ", newVal)
 		self.setValToRegister(register, newVal)
