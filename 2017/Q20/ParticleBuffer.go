@@ -173,6 +173,21 @@ func (p *ParticleBuffer) findCommonElements(
 	return -1
 }
 
+/*
+Derived this beautiful formula all on my own! Fuck yeah \m/
+
+(t^2)*(A2-A1) + t*(2*(V2 - V1) + A1 - A2) - 2(P1 - P2 + V2 - V1) = 0
+
+The positive,integral roots above formula finds the tick for the intersection of the path!
+Note that there could be multiple. findCommonTick returns a list.
+
+The formula is basically derived from -
+pos(t) = pos1 + (t-1)*V1 + ((t*(t-1))/2)*A
+
+pos(t) for 2 different particles will the same if they intersect.
+So posx1(t) == posx2(t) && posy1(t) == posy2(t) && posz1(t) == posz2(t) individually
+for each coordinate plane
+*/
 func (self *ParticleBuffer) findCommonTick(
 	A1, V1, P1,
 	A2, V2, P2 int,
