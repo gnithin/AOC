@@ -9,18 +9,15 @@ import (
 
 func main() {
 	filename := "ip.txt"
-	//filename := "trial.txt"
 	particlesList := getIpListFromFilename(filename)
 	particlesBuffer := ParticleBuffer{
 		particlesList,
 	}
-	//fmt.Println("Particle closest to the origin - ", particlesBuffer.findClosestToOrigin())
+	fmt.Println("Particle closest to the origin - ", particlesBuffer.findClosestToOrigin())
+
 	// Part 2
 	numParticlesLeft := particlesBuffer.performCollisions()
 	fmt.Println("Num particles left after collision - ", numParticlesLeft)
-
-	fmt.Println()
-	// 516 is too high
 }
 
 // FYI: This method ran properly the very first time! No compiler or run time errors!
