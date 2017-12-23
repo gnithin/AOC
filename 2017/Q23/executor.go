@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strconv"
 )
 
@@ -13,9 +14,9 @@ const (
 
 // Holds the instruction details
 type Instruction struct {
-	cmdName  string
-	register string
-	argument interface{}
+	cmdName string
+	arg1    string
+	arg2    string
 }
 
 // Interprets the instruction set
@@ -55,58 +56,58 @@ func (self *Interpreter) run() {
 
 func (self *Interpreter) runInstn() bool {
 	currInstn := self.instnList[self.instnIndex]
-	register := currInstn.register
+	arg1Register := ""
+	arg2Register := ""
+	arg1Val := 0
+	arg2Val := 0
 
-	argVal := 0
-	switch tempArgVal := currInstn.argument.(type) {
-	case int:
-		argVal = tempArgVal
-	case string:
-		intVal, err := strconv.Atoi(tempArgVal)
-		if err == nil {
-			argVal = intVal
-		} else {
-			argVal = self.getValOfRegister(tempArgVal)
-		}
-	case nil:
-		// Pass
-	default:
-		panic("Unknown type for argument")
+	intVal1, err := strconv.Atoi(currInstn.arg1)
+	if err == nil {
+		arg1Val = intVal1
+	} else {
+		arg1Register = currInstn.arg1
+		arg1Val = self.getValOfRegister(arg1Register)
 	}
 
-	//fmt.Println(currInstn.cmdName, register, currInstn.argument, argVal)
+	intVal2, err2 := strconv.Atoi(currInstn.arg2)
+	if err2 == nil {
+		arg2Val = intVal2
+	} else {
+		arg2Register = currInstn.arg2
+		arg2Val = self.getValOfRegister(arg2Register)
+	}
+
+	//fmt.Println(currInstn.cmdName, currInstn.arg1, currInstn.arg2)
 
 	// Add the switch cases here
 	switch currInstn.cmdName {
 	case INSTN_SET:
-		self.setValToRegister(register, argVal)
+		fmt.Println(arg1Register, " = ", arg2Val)
+
+		self.setValToRegister(arg1Register, arg2Val)
 		self.instnIndex += 1
 	case INSTN_SUB:
-		oldVal := self.getValOfRegister(register)
-		newVal := oldVal - argVal
-		self.setValToRegister(register, newVal)
+		fmt.Println(arg1Register, " = ", arg1Val, " - ", arg2Val)
+
+		newVal := arg1Val - arg2Val
+		self.setValToRegister(arg1Register, newVal)
 		self.instnIndex += 1
 
 	case INSTN_MUL:
-		oldVal := self.getValOfRegister(register)
-		newVal := oldVal * argVal
-		self.setValToRegister(register, newVal)
+		fmt.Println(arg1Register, " = ", arg1Val, " * ", arg2Val)
+
+		newVal := arg1Val * arg2Val
+		self.setValToRegister(arg1Register, newVal)
 		self.mulFreq += 1
 		self.instnIndex += 1
 
 	case INSTN_JNZ:
-		regVal := 0
-		val, err := strconv.Atoi(register)
-		if err == nil {
-			regVal = val
-		} else {
-			regVal = self.getValOfRegister(register)
-		}
-
-		if regVal != 0 {
-			self.instnIndex += argVal
+		if arg1Val != 0 {
+			self.instnIndex += arg2Val
+			fmt.Println("JUMPING - ", arg2Val)
 		} else {
 			self.instnIndex += 1
+			fmt.Println("NOT JUMPING")
 		}
 
 	default:
