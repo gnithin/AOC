@@ -11,9 +11,9 @@ func main() {
 	//filename := "trial.txt"
 	gridMap := getIpListFromFilename(filename)
 	grid := createGridFromInitialMap(gridMap)
-	//fmt.Println(grid)
 
-	burstSize := 10000
+	// P2 totally overrides P1. Please look at commit - 289c5e for P1
+	burstSize := 10000000
 	virus := createVirusWithGrid(&grid)
 	virus.infectWithBurstSize(burstSize)
 	fmt.Println("Num infected - ", virus.numInfected)

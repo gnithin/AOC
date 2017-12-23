@@ -1,9 +1,5 @@
 package main
 
-import (
-//"fmt"
-)
-
 type Direction int
 
 const (
@@ -36,24 +32,43 @@ func createVirusWithGrid(grid *Grid) Virus {
 
 func (self *Virus) infectWithBurstSize(burstSize int) {
 	for i := 0; i < burstSize; i++ {
-		//fmt.Println("Step - ", i)
 		self.infect()
 	}
 }
 
 func (self *Virus) infect() {
 	nodeState := self.grid.GetNodeStateForPos(self.currPos)
-	if nodeState == NODE_INFECTED {
-		self.turnRight()
-		self.grid.CleanNodeAtPos(self.currPos)
-	} else {
+	switch nodeState {
+	case NODE_CLEAN:
 		self.turnLeft()
+		self.grid.WeakenNodeAtPos(self.currPos)
+	case NODE_FLAGGED:
+		self.turnReverse()
+		self.grid.CleanNodeAtPos(self.currPos)
+
+	case NODE_WEAKENED:
+		// no turn
 		self.grid.InfectNodeAtPos(self.currPos)
 		self.numInfected += 1
+	case NODE_INFECTED:
+		self.turnRight()
+		self.grid.FlagNodeAtPos(self.currPos)
 	}
 	self.move()
 	//fmt.Println((*self.grid))
 	//fmt.Println("****")
+}
+func (self *Virus) turnReverse() {
+	switch self.currDirection {
+	case N:
+		self.currDirection = S
+	case S:
+		self.currDirection = N
+	case E:
+		self.currDirection = W
+	case W:
+		self.currDirection = E
+	}
 }
 
 func (self *Virus) turnRight() {

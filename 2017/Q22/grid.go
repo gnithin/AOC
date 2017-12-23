@@ -9,6 +9,8 @@ type NodeState int
 const (
 	NODE_CLEAN NodeState = iota
 	NODE_INFECTED
+	NODE_WEAKENED
+	NODE_FLAGGED
 )
 
 const (
@@ -24,10 +26,14 @@ type Position struct {
 type Grid struct {
 	intialInfectedPositions map[Position]int
 	infectedPositions       map[Position]int
+	flaggedPositions        map[Position]int
+	weakenedPositions       map[Position]int
 }
 
 func createGridFromInitialMap(gridMap [][]string) Grid {
 	grid := Grid{
+		make(map[Position]int),
+		make(map[Position]int),
 		make(map[Position]int),
 		make(map[Position]int),
 	}
@@ -38,7 +44,6 @@ func createGridFromInitialMap(gridMap [][]string) Grid {
 func (self *Grid) getInfectedNodesFromMap(gridMap [][]string) {
 	height := len(gridMap)
 	width := len(gridMap[0])
-
 	if height%2 == 0 || width%2 == 0 {
 		panic("Cannot find middle element in even number dimensions")
 	}
@@ -68,23 +73,45 @@ func (self *Grid) getInfectedNodesFromMap(gridMap [][]string) {
 }
 
 func (self *Grid) InfectNodeAtPos(pos Position) {
-	val, _ := self.infectedPositions[pos]
-	self.infectedPositions[pos] = val + 1
+	_, found := self.weakenedPositions[pos]
+	if !found {
+		panic("should not happen!")
+	}
+	delete(self.weakenedPositions, pos)
+	self.infectedPositions[pos] = 1
+}
+
+func (self *Grid) WeakenNodeAtPos(pos Position) {
+	self.weakenedPositions[pos] = 1
+}
+
+func (self *Grid) FlagNodeAtPos(pos Position) {
+	_, found := self.infectedPositions[pos]
+	if !found {
+		panic("should not happen!")
+	}
+	delete(self.infectedPositions, pos)
+	self.flaggedPositions[pos] = 1
 }
 
 func (self *Grid) CleanNodeAtPos(pos Position) {
-	_, found := self.infectedPositions[pos]
-	if found {
-		delete(self.infectedPositions, pos)
-	}
+	delete(self.flaggedPositions, pos)
 }
 
 func (self *Grid) GetNodeStateForPos(pos Position) NodeState {
-	_, keyFound := self.infectedPositions[pos]
-	if keyFound == false {
-		return NODE_CLEAN
+	_, isFlagged := self.flaggedPositions[pos]
+	if isFlagged {
+		return NODE_FLAGGED
 	}
-	return NODE_INFECTED
+	_, isWeakened := self.weakenedPositions[pos]
+	if isWeakened {
+		return NODE_WEAKENED
+	}
+	_, isInfected := self.infectedPositions[pos]
+	if isInfected {
+		return NODE_INFECTED
+	}
+	return NODE_CLEAN
 }
 
 func (self Grid) String() string {
