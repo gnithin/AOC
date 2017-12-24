@@ -12,6 +12,7 @@ func main() {
 	instnList := getIpListFromFilename(filename)
 	// Part 1
 	interpreter := createInterpreter(instnList)
+	interpreter.varEnv["a"] = 1
 	interpreter.run()
 	mulFreq := interpreter.mulFreq
 	fmt.Println("mul freq - ", mulFreq)

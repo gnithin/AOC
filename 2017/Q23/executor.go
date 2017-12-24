@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	//	"fmt"
 	"strconv"
 )
 
@@ -82,19 +82,19 @@ func (self *Interpreter) runInstn() bool {
 	// Add the switch cases here
 	switch currInstn.cmdName {
 	case INSTN_SET:
-		fmt.Println(arg1Register, " = ", arg2Val)
+		//fmt.Println(arg1Register, " = ", arg2Val)
 
 		self.setValToRegister(arg1Register, arg2Val)
 		self.instnIndex += 1
 	case INSTN_SUB:
-		fmt.Println(arg1Register, " = ", arg1Val, " - ", arg2Val)
+		//fmt.Println(arg1Register, " = ", arg1Val, " - ", arg2Val)
 
 		newVal := arg1Val - arg2Val
 		self.setValToRegister(arg1Register, newVal)
 		self.instnIndex += 1
 
 	case INSTN_MUL:
-		fmt.Println(arg1Register, " = ", arg1Val, " * ", arg2Val)
+		//fmt.Println(arg1Register, " = ", arg1Val, " * ", arg2Val)
 
 		newVal := arg1Val * arg2Val
 		self.setValToRegister(arg1Register, newVal)
@@ -104,10 +104,10 @@ func (self *Interpreter) runInstn() bool {
 	case INSTN_JNZ:
 		if arg1Val != 0 {
 			self.instnIndex += arg2Val
-			fmt.Println("JUMPING - ", arg2Val)
+			//fmt.Println("JUMPING - ", arg2Val)
 		} else {
 			self.instnIndex += 1
-			fmt.Println("NOT JUMPING")
+			//fmt.Println("NOT JUMPING")
 		}
 
 	default:
