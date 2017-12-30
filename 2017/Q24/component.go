@@ -28,18 +28,26 @@ func CreateComponentWithPorts(portA, portB int) Component {
 func getMaxScoreFromCompList(compList []Component) int {
 	initialParentPort := 0
 	initialScore := 0
-	maxScore := getMaxScore(compList, initialParentPort, initialScore)
+	maxScore, _ := getMaxScore(compList, initialParentPort, initialScore, 0, false)
 	return maxScore
 }
 
-func getMaxScore(remainingItems []Component, parentPort int, score int) int {
+func getMaxScoreWithDepthFromCompList(compList []Component) int {
+	initialParentPort := 0
+	initialScore := 0
+	maxScore, _ := getMaxScore(compList, initialParentPort, initialScore, 0, true)
+	return maxScore
+}
+
+func getMaxScore(remainingItems []Component, parentPort int, score int, depth int, withMaxDepth bool) (int, int) {
 	// Find the components whose parentPort matches
 	parentPortsIndices := removePortsFromList(parentPort, remainingItems)
 	if len(parentPortsIndices) == 0 {
-		return score
+		return score, depth
 	}
 
 	tempMaxScore := score
+	tempMaxDepth := depth
 	for _, ppIndex := range parentPortsIndices {
 		compWithParentPort := remainingItems[ppIndex]
 		var compWithoutParentPorts []Component
@@ -54,13 +62,24 @@ func getMaxScore(remainingItems []Component, parentPort int, score int) int {
 			otherPortVal = compWithParentPort.port2
 		}
 		currScore := score + parentPort + otherPortVal
-		updatedScore := getMaxScore(compWithoutParentPorts, otherPortVal, currScore)
-		if updatedScore > tempMaxScore {
-			tempMaxScore = updatedScore
+		updatedScore, updatedDepth := getMaxScore(compWithoutParentPorts, otherPortVal, currScore, depth+1, withMaxDepth)
+		if !withMaxDepth {
+			if updatedScore > tempMaxScore {
+				tempMaxScore = updatedScore
+			}
+		} else {
+			if updatedDepth > tempMaxDepth {
+				tempMaxDepth = updatedDepth
+				tempMaxScore = updatedScore
+			} else if updatedDepth == tempMaxDepth {
+				if updatedScore > tempMaxScore {
+					tempMaxScore = updatedScore
+				}
+			}
 		}
 	}
 
-	return tempMaxScore
+	return tempMaxScore, tempMaxDepth
 }
 
 func removePortsFromList(port int, origCompList []Component) []int {

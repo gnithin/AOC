@@ -8,16 +8,15 @@ import (
 )
 
 func main() {
-	//filename := "ip.txt"
-	filename := "trial.txt"
+	filename := "ip.txt"
+	//filename := "trial.txt"
 	compList := getIpListFromFilename(filename)
-	fmt.Println(compList)
-	fmt.Println("*****")
 
 	maxScore := getMaxScoreFromCompList(compList)
-	fmt.Println("*****")
-	fmt.Println("Max score - ", maxScore)
-	fmt.Println("*****")
+	fmt.Println("Max score P1 - ", maxScore)
+
+	maxScore = getMaxScoreWithDepthFromCompList(compList)
+	fmt.Println("Max score P2 - ", maxScore)
 }
 
 func getIpListFromFilename(filename string) []Component {
