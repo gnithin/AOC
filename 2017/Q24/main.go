@@ -11,10 +11,13 @@ func main() {
 	//filename := "ip.txt"
 	filename := "trial.txt"
 	compList := getIpListFromFilename(filename)
+	fmt.Println(compList)
+	fmt.Println("*****")
 
-	componentManager := CreateManagerWithComponentList(compList)
-	componentManager.printComponentsMap()
-	fmt.Println()
+	maxScore := getMaxScoreFromCompList(compList)
+	fmt.Println("*****")
+	fmt.Println("Max score - ", maxScore)
+	fmt.Println("*****")
 }
 
 func getIpListFromFilename(filename string) []Component {
@@ -35,8 +38,8 @@ func getIpListFromFilename(filename string) []Component {
 
 		compList = append(compList,
 			CreateComponentWithPorts(
-				PortType(portComponents[0]),
-				PortType(portComponents[1]),
+				portComponents[0],
+				portComponents[1],
 			),
 		)
 	}
