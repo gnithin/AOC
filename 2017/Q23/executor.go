@@ -1,7 +1,7 @@
 package main
 
 import (
-	//	"fmt"
+	"fmt"
 	"strconv"
 )
 
@@ -46,12 +46,25 @@ func (self *Interpreter) setValToRegister(regName string, val int) {
 }
 
 func (self *Interpreter) run() {
+	stepsLimit := 10000000
+	steps := 0
 	for self.instnIndex >= 0 && self.instnIndex < len(self.instnList) {
+		if steps > stepsLimit {
+			fmt.Println("Stopping!")
+			break
+		} else {
+			//fmt.Println(steps, "g - ", self.getValOfRegister("g"))
+			fmt.Println("Step number - ", self.instnIndex, " -> ", self.instnList[self.instnIndex])
+			steps += 1
+		}
 		shouldStop := self.runInstn()
 		if shouldStop {
+			fmt.Println("Stopping automatically!")
 			break
 		}
 	}
+	fmt.Println(steps)
+	fmt.Println(self.instnIndex)
 }
 
 func (self *Interpreter) runInstn() bool {
@@ -102,6 +115,7 @@ func (self *Interpreter) runInstn() bool {
 		self.instnIndex += 1
 
 	case INSTN_JNZ:
+		//fmt.Println("***j")
 		if arg1Val != 0 {
 			self.instnIndex += arg2Val
 			//fmt.Println("JUMPING - ", arg2Val)

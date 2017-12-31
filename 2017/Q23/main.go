@@ -12,10 +12,21 @@ func main() {
 	instnList := getIpListFromFilename(filename)
 	// Part 1
 	interpreter := createInterpreter(instnList)
-	interpreter.varEnv["a"] = 1
+	/*
+		interpreter.varEnv["a"] = 1
+		interpreter.varEnv["d"] = 2
+		interpreter.varEnv["e"] = 106500
+		interpreter.varEnv["g"] = 0
+		interpreter.varEnv["b"] = 106500
+		interpreter.varEnv["c"] = 123500
+		interpreter.varEnv["f"] = 0
+		interpreter.instnIndex = 20
+		//mulFreq := interpreter.mulFreq
+		//fmt.Println("mul freq - ", mulFreq)
+	*/
 	interpreter.run()
-	mulFreq := interpreter.mulFreq
-	fmt.Println("mul freq - ", mulFreq)
+	fmt.Println(interpreter.varEnv)
+	fmt.Printf("")
 
 	/*
 		interpreter2 := createInterpreter(instnList)
