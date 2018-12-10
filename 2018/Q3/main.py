@@ -58,6 +58,25 @@ class RectManager:
                     overlaps.add(entry)
         return overlaps
 
+    def find_no_overlap_id(self):
+        mul_points_list = [rect.get_all_points() for rect in self.rect_list]
+        ids_list = [rect.name for rect in self.rect_list]
+        max_entries = len(self.rect_list)
+        for i in range(0, max_entries - 1):
+            for j in range(i+1, max_entries):
+                if self.rect_list[i].name not in ids_list and \
+                        self.rect_list[j].name not in ids_list:
+                    continue
+                res = set(mul_points_list[i]).intersection(
+                    set(mul_points_list[j]))
+                if len(res) != 0:
+                    # Remove i and j entries
+                    if self.rect_list[i].name in ids_list:
+                        ids_list.remove(self.rect_list[i].name)
+                    if self.rect_list[j].name in ids_list:
+                        ids_list.remove(self.rect_list[j].name)
+        return ids_list
+
 
 if __name__ == "__main__":
     ip_file = "trial_ip.txt"
@@ -73,6 +92,13 @@ if __name__ == "__main__":
         rect_list.append(rect)
 
     manager = RectManager(rect_list)
+
+    # part-1
     print("Number of overlaps -")
     overlaps = manager.find_overlaps()
     print(len(overlaps))
+
+    # part-2
+    print("Unique ID")
+    unique_id = manager.find_no_overlap_id()
+    print(unique_id[0])
