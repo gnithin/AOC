@@ -1,3 +1,4 @@
 *.xcworkspacedata
 xcuserdata/
 .idea/
+venv/
