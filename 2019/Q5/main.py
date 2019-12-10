@@ -21,8 +21,39 @@ def process_test(li):
             print("output - ", op)
             i += 2
         elif cmd == 5:
-            
-
+            ## Jump if true
+            condn = get_val_for_mode(li, i + 1, params[0])
+            if condn != 0:
+                loc = get_val_for_mode(li, i + 2, params[1])
+                i = loc
+            else:
+                i += 3
+        elif cmd == 6:
+            ## Jump if false
+            condn = get_val_for_mode(li, i + 1, params[0])
+            if condn == 0:
+                loc = get_val_for_mode(li, i + 2, params[1])
+                i = loc
+            else:
+                i += 3
+        elif cmd == 7:
+            ## less than
+            p1 = get_val_for_mode(li, i + 1, params[0])
+            p2 = get_val_for_mode(li, i + 2, params[1])
+            val = 0
+            if p1 < p2:
+                val = 1
+            li[li[i + 3]] = val
+            i = i + 4
+        elif cmd == 8:
+            ## Equal
+            p1 = get_val_for_mode(li, i + 1, params[0])
+            p2 = get_val_for_mode(li, i + 2, params[1])
+            val = 0
+            if p1 == p2:
+                val = 1
+            li[li[i + 3]] = val
+            i = i + 4
 
     return li
 
@@ -37,6 +68,8 @@ def get_params(val):
     while val > 0:
         modes.append(val % 10)
         val = val // 10
+
+    # Appending more values that might be necessary
     modes.append(0)
     modes.append(0)
     modes.append(0)
