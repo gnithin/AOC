@@ -91,9 +91,18 @@ class IntCode:
             return li[index]
 
 
-def gen(li):
-    for i in li:
-        yield str(i)
+class Gen:
+    def __init__(self, li):
+        self.li = li
+
+    def gen(self):
+        i = 0
+        while i < len(self.li):
+            yield self.li[i]
+            i += 1
+
+    def add_list_val(self, val):
+        self.li.append(val)
 
 
 def get_max_amplitude(ip_list, chain_size):
@@ -101,19 +110,61 @@ def get_max_amplitude(ip_list, chain_size):
     for p in permutations(range(chain_size)):
         output_val = 0
         for phase in p:
-            ip_func = gen([phase, output_val])
+            ip_func = Gen([phase, output_val]).gen()
             ic_code = IntCode(ip_list[:], ip_func)
-            output_val = next(ic_code.process_test())
+            try:
+                output_val = next(ic_code.process_test())
+            except StopIteration:
+                break
+        outputs_map[p] = output_val
+    return outputs_map
+
+
+def get_max_amplitude_from_feedback(ip_list, chain_size):
+    outputs_map = {}
+    for p in permutations(range(chain_size, chain_size * 2)):
+        output_val = 0
+        did_stop = False
+
+        test_codes = []
+        ip_funcs = []
+        for phase in p:
+            ip_func = Gen([phase, output_val])
+            ip_funcs.append(ip_func)
+
+            ic_code = IntCode(ip_list[:], ip_func.gen())
+            test_code = ic_code.process_test()
+            test_codes.append(test_code)
+
+            try:
+                output_val = next(test_code)
+            except StopIteration:
+                did_stop = True
+                break
+
+        i = 0
+        while not did_stop:
+            ip_funcs[i].add_list_val(output_val)
+            try:
+                output_val = next(test_codes[i])
+            except StopIteration:
+                did_stop = True
+                break
+            i = (i + 1) % len(p)
+
         outputs_map[p] = output_val
     return outputs_map
 
 
 if __name__ == "__main__":
     ip_list = []
-    with open("ip1.txt", "r") as fp:
+    with open("ip2.txt", "r") as fp:
         for line in fp:
             for entry in line.strip().split(","):
                 ip_list.append(int(entry))
 
-    amplitudes = get_max_amplitude(ip_list, 5)
+    # amplitudes = get_max_amplitude(ip_list, 5)
+    # print(max(amplitudes.values()))
+
+    amplitudes = get_max_amplitude_from_feedback(ip_list, 5)
     print(max(amplitudes.values()))
