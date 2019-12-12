@@ -8,6 +8,23 @@ class LayerManager:
         print(layer)
         return layer.find_num_digits(1) * layer.find_num_digits(2)
 
+    def multiply_layers(self):
+        product = self.layers[0]
+        width = product.w
+        height = product.h
+        for layer in self.layers[1:]:
+            for w in range(width):
+                for h in range(height):
+                    if product.matrix[w][h] == 2:
+                        product.matrix[w][h] = layer.matrix[w][h]
+
+        for w in range(width):
+            li = []
+            for h in range(height):
+                val = product.matrix[w][h]
+                li.append(val if val == 1 else " ")
+            print("".join(map(str, li)))
+
 
 class Layer:
     def __init__(self, w, h, ip):
@@ -46,18 +63,20 @@ def get_layers(w, h, ip_list):
 
 
 if __name__ == "__main__":
-    # file_name = "ip1.txt"
-    # width = 3
-    # height = 2
+    file_name = "ip1.txt"
+    width = 2
+    height = 2
 
     file_name = "ip2.txt"
     width = 25
     height = 6
-
+    #
     with open(file_name, "r") as fp:
         ip_list = list(map(int, [c for c in fp.read().strip()]))
 
     layers = get_layers(height, width, ip_list)
     mgr = LayerManager(layers)
-    layer = mgr.get_part_1()
-    print(layer)
+    # layer = mgr.get_part_1()
+    # print(layer)
+
+    mgr.multiply_layers()
