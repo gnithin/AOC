@@ -22,7 +22,8 @@ class CustomList:
 
     def __setitem__(self, key, value):
         if key < 0:
-            raise Exception("Negative index!")
+            # print("Negative index!")
+            return
         self.map[key] = value
 
     def __len__(self):
@@ -40,20 +41,28 @@ class IntCode:
         while i < len(self.li):
             cmd = self.get_cmd(self.li[i])
             params = self.get_params(self.li[i])
+            # print("Command - ", cmd)
+            # print("List - ", self.li.map)
+            # print("Relative base - ", self.relative_base)
+            # print("*" * 10)
 
             if cmd == 99:
                 break
             elif cmd == 1:
-                self.li[self.li[i + 3]] = self.get_val_for_mode(self.li, i + 1, params[0]) + \
-                                          self.get_val_for_mode(self.li, i + 2, params[1])
+                self.li[self.get_index_for_mode(self.li, i + 3, params[2])] = self.get_val_for_mode(self.li, i + 1,
+                                                                                                    params[0]) + \
+                                                                              self.get_val_for_mode(self.li, i + 2,
+                                                                                                    params[1])
                 i = i + 4
             elif cmd == 2:
-                self.li[self.li[i + 3]] = self.get_val_for_mode(self.li, i + 1, params[0]) * \
-                                          self.get_val_for_mode(self.li, i + 2, params[1])
+                self.li[self.get_index_for_mode(self.li, i + 3, params[2])] = self.get_val_for_mode(self.li, i + 1,
+                                                                                                    params[0]) * \
+                                                                              self.get_val_for_mode(self.li, i + 2,
+                                                                                                    params[1])
                 i = i + 4
             elif cmd == 3:
                 ip = int(next(self.input_src))
-                self.li[self.get_val_for_mode(self.li, i + 1, params[0])] = ip
+                self.li[self.get_index_for_mode(self.li, i + 1, params[0])] = ip
                 i += 2
             elif cmd == 4:
                 op = self.get_val_for_mode(self.li, i + 1, params[0])
@@ -82,7 +91,7 @@ class IntCode:
                 val = 0
                 if p1 < p2:
                     val = 1
-                self.li[self.li[i + 3]] = val
+                self.li[self.get_index_for_mode(self.li, i + 3, params[2])] = val
                 i = i + 4
             elif cmd == 8:
                 ## Equal
@@ -91,7 +100,7 @@ class IntCode:
                 val = 0
                 if p1 == p2:
                     val = 1
-                self.li[self.li[i + 3]] = val
+                self.li[self.get_index_for_mode(self.li, i + 3, params[2])] = val
                 i = i + 4
             elif cmd == 9:
                 # Relative base offset
@@ -114,15 +123,19 @@ class IntCode:
         modes.append(0)
         modes.append(0)
         modes.append(0)
+        modes.append(0)
         return modes
 
     def get_val_for_mode(self, li, index, mode):
+        return li[self.get_index_for_mode(li, index, mode)]
+
+    def get_index_for_mode(self, li, index, mode):
         if mode == 0:
-            return li[li[index]]
-        elif mode == 2:
-            return li[self.relative_base + li[index]]
-        else:
             return li[index]
+        elif mode == 2:
+            return self.relative_base + li[index]
+        else:
+            return index
 
 
 class Gen:
@@ -141,7 +154,7 @@ class Gen:
 
 if __name__ == "__main__":
     filename = "ip1.txt"
-    filename = "ip2.txt"
+    # filename = "ip2.txt"
     with open(filename, "r") as fp:
         lines = [line.strip() for line in fp]
         line = lines[0]
@@ -149,4 +162,4 @@ if __name__ == "__main__":
     ic_code = IntCode(ip_list, Gen(["1"]).gen())
     ic_gen = ic_code.process_test()
     for op in ic_gen:
-        print(op)
+        print("Output - ", op)
