@@ -159,7 +159,12 @@ if __name__ == "__main__":
         lines = [line.strip() for line in fp]
         line = lines[0]
         ip_list = list(map(int, line.split(",")))
-    ic_code = IntCode(ip_list, Gen(["1"]).gen())
+    # Part 1
+    # ic_code = IntCode(ip_list, Gen(["1"]).gen())
+
+    # Part 2
+    ic_code = IntCode(ip_list, Gen(["2"]).gen())
+
     ic_gen = ic_code.process_test()
     for op in ic_gen:
         print("Output - ", op)
