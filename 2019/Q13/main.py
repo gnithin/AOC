@@ -60,20 +60,20 @@ class Arcade:
     __score: int = field(default=0)
 
     def get_coords(self):
-        self.__coords = {}
         while True:
             try:
                 x = next(ic_gen)
                 y = next(ic_gen)
                 id = next(ic_gen)
-                print(f"Got - {x}, {y}, {id}")
+                # print(f"Got - {x}, {y}, {id}")
                 if x == -1 and y == 0:
                     self.__score = id
-                    break
                 else:
                     self.__coords[Coord(x, y)] = TileType.get_type(id)
+                self.draw()
+
             except StopIteration:
-                raise Exception("as")
+                print(e)
             except Exception as e:
                 print(e)
         return self.__coords
@@ -111,17 +111,16 @@ class Arcade:
 
     def play(self):
         self.get_coords()
-        self.draw()
+        # self.draw()
 
         while True:
-            move_str = input("Your Move - (Left:-1, Right:1, Neutral:0) ")
-            move_val = int(move_str)
-            print("Loading move val - ", move_val)
-            self.generator.add_list_val(move_val)
-            print("*" * 10)
+            # move_str = input("Your Move - (Left:-1, Right:1, Neutral:0) ")
+            # move_val = int(move_str)
+            # print("Loading move val - ", move_val)
+            # self.generator.add_list_val(move_val)
+            # print("*" * 10)
 
             self.get_coords()
-            self.draw()
 
 
 if __name__ == "__main__":
