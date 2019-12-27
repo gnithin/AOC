@@ -58,6 +58,8 @@ class Arcade:
     generator: Gen
     __coords: Dict[Coord, TileType] = field(default_factory=dict)
     __score: int = field(default=0)
+    __ball_pos = None
+    __paddle_pos = None
 
     def get_coords(self):
         while True:
@@ -68,14 +70,45 @@ class Arcade:
                 # print(f"Got - {x}, {y}, {id}")
                 if x == -1 and y == 0:
                     self.__score = id
+                    self.draw()
                 else:
-                    self.__coords[Coord(x, y)] = TileType.get_type(id)
-                self.draw()
+                    type = TileType.get_type(id)
+                    coord = Coord(x, y)
+                    self.__coords[coord] = type
+                    if type == TileType.BALL:
+                        # print("BALL-pos - " + str(coord))
+                        self.__ball_pos = coord
+                        if self.__paddle_pos is not None:
+                            diff = self.__paddle_pos.x - self.__ball_pos.x
+                            # print("Diff - " + str(diff))
+                            if diff < 0:
+                                self.generator.add_list_val(1)
+                            elif diff > 0:
+                                self.generator.add_list_val(-1)
+                            else:
+                                self.generator.add_list_val(0)
 
-            except StopIteration:
+                    elif type == TileType.HOR_PADDLE:
+                        # print("Paddle -pos - " + str(coord))
+                        if self.__paddle_pos is None:
+                            self.__paddle_pos = coord
+                            diff = self.__paddle_pos.x - self.__ball_pos.x
+                            # print("Diff - " + str(diff))
+                            if diff < 0:
+                                self.generator.add_list_val(1)
+                            elif diff > 0:
+                                self.generator.add_list_val(-1)
+                            else:
+                                self.generator.add_list_val(0)
+                        else:
+                            self.__paddle_pos = coord
+
+            except StopIteration as e:
                 print(e)
+                return False
             except Exception as e:
                 print(e)
+                return False
         return self.__coords
 
     def draw(self):
@@ -120,7 +153,9 @@ class Arcade:
             # self.generator.add_list_val(move_val)
             # print("*" * 10)
 
-            self.get_coords()
+            val = self.get_coords()
+            if val is False:
+                break
 
 
 if __name__ == "__main__":

@@ -64,7 +64,9 @@ class IntCode:
                                                                                                     params[1])
                 i = i + 4
             elif cmd == 3:
+                # ip = int(input("Ip - "))
                 ip = int(next(self.input_src))
+                # print("Val - " + str(ip))
                 self.li[self.get_index_for_mode(self.li, i + 1, params[0])] = ip
                 i += 2
             elif cmd == 4:
@@ -152,4 +154,5 @@ class Gen:
             i += 1
 
     def add_list_val(self, val):
+        # print("Added value - " + str(val))
         self.li.append(val)
